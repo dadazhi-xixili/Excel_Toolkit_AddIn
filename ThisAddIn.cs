@@ -10,8 +10,8 @@ using Office = Microsoft.Office.Core;
 
 namespace Excel_Toolkit
 {
-    [Guid("2E79EE15-C38A-4262-A29F-FA5535495903")]
-    [ProgId("Contoso.ExcelTookit.AddIn")]
+    [Guid("6F26193E-E505-4648-9A48-B762990EDDC6")]
+    [ProgId("XXL.ExcelToolkit.AddIn")]
     public partial class ThisAddIn
     {
         public Excel.Application app;

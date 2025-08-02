@@ -10,7 +10,6 @@ namespace Excel_Toolkit
 {
     public class WebView : Microsoft.Web.WebView2.WinForms.WebView2
     {
-        
         public Microsoft.Office.Tools.CustomTaskPane controlTaskPane;
         public Layout layout = Globals.ThisAddIn.layout;
         public string appPath = AppDomain.CurrentDomain.BaseDirectory;
@@ -28,6 +27,7 @@ namespace Excel_Toolkit
             controlTaskPane.Width = 1200;
             layout.webView = this;
             initTask = InitWebView(pane);
+          
         }
         public enum Pane
         {
