@@ -19,7 +19,7 @@ namespace Excel_Toolkit
             conn = new SQLiteConnection("Data Source=" + dbPath + ";Version=3;");
             conn.Open();
         }
-
+        #region 获取函数数据
         public string[] GetLevel1()
         {
             string sql = @"SELECT MIN(id) as id, level1 FROM 内容 GROUP BY level1 ORDER BY id ASC";
@@ -64,11 +64,12 @@ namespace Excel_Toolkit
             return GetData(sql);
         }
 
-        public List<Dictionary<string, object>> GetAll()
+        public List<Dictionary<string, object>> GetTableAll(string tableName)
         {
-            string sql = "SELECT * FROM 内容";
+            string sql = $"SELECT * FROM {tableName}";
             return GetData(sql);
         }
+        #endregion
 
         public List<Dictionary<string, object>> GetData(string sql)
         {

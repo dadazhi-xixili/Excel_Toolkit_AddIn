@@ -26,7 +26,7 @@ namespace Excel_Toolkit
             layout = Globals.ThisAddIn.layout;
             layout.ribbon = this;
             level1 = layout.level1;
-            Xml.IControl[]  buttons = level1.Select(label => (Xml.IControl)new Xml.Button(label, label, "Level1ButtonClick")).ToArray();
+            Xml.Control[] buttons = level1.Select(label => (Xml.Control)new Xml.Button(label, label, "Level1ButtonClick")).ToArray();
             Xml.Group[] groups = { new Xml.Group("函数分组", "函数分组", buttons) };
             Xml.Tab[] tabs = { new Xml.Tab("Toolkit", "Toolkit", groups) };
             Xml xml = new Xml(tabs);
@@ -66,8 +66,8 @@ namespace Excel_Toolkit
             }
             public struct Tab
             {
-                string id;
-                string label;
+                public string id;
+                public string label;
                 Group[] groups;
                 public Tab(string id, string label, Group[] groups)
                 {
@@ -85,39 +85,68 @@ namespace Excel_Toolkit
                     xml += "</tab>";
                     return xml;
                 }
-            }
-            public interface IControl
-            {
-                string ToXml();
+                public Tab AddGroup(Group group)
+                {
+                    Group[] newGroups = new Group[this.groups.Length + 1];
+                    for (int i = 0; i < this.groups.Length; i++)
+                    {
+                        newGroups[i] = this.groups[i];
+                    }
+                    groups[this.groups.Length] = group;
+                    this.groups = newGroups;
+                    return this;
+                }
             }
             public struct Group
             {
-                string id;
-                string label;
-                IControl[] controls;
-                public Group(string id, string label, IControl[] controls)
+                public string id;
+                public string label;
+                Control[] controls;
+                public Group(string id, string label, Control[] controls)
                 {
                     this.id = id;
                     this.label = label;
                     this.controls = controls;
                 }
+                public Group AddControl(Control control)
+                {
+                    Control[] newControls = new Control[this.controls.Length + 1];
+                    for (int i = 0; i < this.controls.Length; i++)
+                    {
+                        newControls[i] = this.controls[i];
+                    }
+                    controls[this.controls.Length] = control;
+                    this.controls = newControls;
+                    return this;
+                }
+                public Group AddControls(Control[] controls)
+                {
+                    Control[] newControls = new Control[this.controls.Length + controls.Length];
+                    Array.Copy(this.controls, newControls, this.controls.Length);
+                    Array.Copy(controls, 0, newControls, this.controls.Length, controls.Length);
+                    this.controls = newControls;
+                    return this;
+                }
                 public string ToXml()
                 {
                     string xml = $@"<group id=""{id}"" label=""{label}"">";
-                    foreach (IControl control in this.controls)
+                    foreach (Control control in this.controls)
                     {
                         xml += control.ToXml();
                     }
-                    xml+= "</group>";
+                    xml += "</group>";
                     return xml;
                 }
-
             }
-            public struct Button : IControl
+            public interface Control
             {
-                string id;
-                string label;
-                string onAction;
+                string ToXml();
+            }
+            public struct Button : Control
+            {
+                public string id;
+                public string label;
+                public string onAction;
                 public Button(string id, string label, string onAction)
                 {
                     this.id = id;
@@ -129,18 +158,18 @@ namespace Excel_Toolkit
                     return $"<button id=\"{id}\" label=\"{label}\" onAction=\"{onAction}\" />";
                 }
             }
-             public struct Separator : IControl
-    {
-        string id;
-        public Separator(string id)
-        {
-            this.id = id;
-        }
-        public string ToXml()
-        {
-            return $"<separator id=\"{id}\" />";
-        }
-    }
+            public struct Separator : Control
+            {
+                public string id;
+                public Separator(string id)
+                {
+                    this.id = id;
+                }
+                public string ToXml()
+                {
+                    return $"<separator id=\"{id}\" />";
+                }
+            }
         }
     }
 }

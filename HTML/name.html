@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+	<meta charset="UTF-8">
+	<link rel="icon" href="data:," />
+	<style>
+		.controlPane {
+			width: 100%;
+			th:nth-child(1),th:nth-child(2),th:nth-child(3){
+				width: 60px;
+			}
+		}
+	</style>
+	<title>Excel Toolkit</title>
+</head>
+
+<body>
+	<table class="controlPane">
+		<caption>名称管理器</caption>
+		<thead>
+			<tr>
+				<th colspan="3" class="isIn">激活范围</th>
+				<th rowspan="2" class="name">名称</th>
+				<th rowspan="2" class="func">表达式</th>
+			</tr>
+			<tr>
+				<th class="app">全局</th>
+				<th class="book">工作簿</th>
+				<th class="sheet">工作表</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td><input type="radio"></td>
+				<td><input type="radio"></td>
+				<td><input type="radio"></td>
+				<td><input type="text"></td>
+				<td><input type="text"></td>
+			</tr>
+		</tbody>
+	</table>
+</body>
+</html>

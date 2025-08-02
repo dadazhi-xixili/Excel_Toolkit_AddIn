@@ -5,6 +5,8 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Text.Json;
+using System.Windows.Forms;
+using Excel = Microsoft.Office.Interop.Excel;
 namespace Excel_Toolkit
 {
     [ComVisible(true)]
@@ -17,42 +19,36 @@ namespace Excel_Toolkit
         public WebView webView;
         public string[] level1;
         public string level1Active;
+        public Excel.Application app;
         public Layout()
         {
             sql = new Sqlite();
             level1 = sql.GetLevel1();
+            addIn = Globals.ThisAddIn;
         }
 
+
         #region 功能区用户控件交互
-        public async void Level1ButtonClick(string level1)
+        public void Level1ButtonClick(string level1)
         {
-            if (level1Active == null)
+            WebView.Pane pane = WebView.Pane.query;
+            if (webView == null) webView = new WebView(pane);
+            if (webView.pane != pane) webView.LoadHTML(pane);
+            if (level1 == level1Active)
             {
-                webView = new WebView();
-                string jsCode = $"layout.InitLevel2('{level1}')";
-                await webView.RunJS(jsCode);
-                webView.ShowControl(true);
-                level1Active = level1;
-            }
-            else if (level1 != level1Active)
-            {
-                string jsCode = $"layout.InitLevel2('{level1}')";
-                await webView.RunJS(jsCode);
-                webView.ShowControl(true);
-                level1Active = level1;
-            }
-            else if (webView.controlTaskPane.Visible == false)
-            {
-                webView.ShowControl(true);
+                if (webView.controlTaskPane.Visible) webView.controlTaskPane.Visible = false;
             }
             else
             {
-                webView.ShowControl(false);
+                webView.RunJS($"InitLevel2('{level1}')");
+                level1Active = level1;
+                webView.controlTaskPane.Visible = true;
             }
         }
         #endregion
 
         #region 传递Sqlite查询
+        #region 函数查询部分
         public string[] GetLevel1()
         {
             string[] data = sql.GetLevel1();
@@ -72,6 +68,7 @@ namespace Excel_Toolkit
         {
             return sql.GetContent(level1, level2);
         }
+        #endregion
 
         private string DataToJson(object data)
         {

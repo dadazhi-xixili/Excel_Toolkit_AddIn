@@ -1,22 +1,25 @@
-﻿using System;
+﻿using Microsoft.Office.Tools.Excel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Xml.Linq;
 using Excel = Microsoft.Office.Interop.Excel;
 using Office = Microsoft.Office.Core;
-using Microsoft.Office.Tools.Excel;
 
 namespace Excel_Toolkit
 {
+    [Guid("2E79EE15-C38A-4262-A29F-FA5535495903")]
+    [ProgId("Contoso.ExcelTookit.AddIn")]
     public partial class ThisAddIn
     {
         public Excel.Application app;
-        public Microsoft.Office.Tools.CustomTaskPane content;
         public Layout layout = new Layout();
         private void ThisAddIn_Startup(object sender, System.EventArgs e)
         {
-            app = Application;
+            layout.addIn = this;
+            layout.app = Application;
         }
         private void ThisAddIn_Shutdown(object sender, System.EventArgs e)
         {
