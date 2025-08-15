@@ -1,66 +1,75 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Microsoft.Office.Tools;
 using Microsoft.Web.WebView2.Core;
+using Microsoft.Web.WebView2.WinForms;
+
 namespace Excel_Toolkit
 {
-    public class WebView : Microsoft.Web.WebView2.WinForms.WebView2
+    public class WebView : WebView2
     {
-        public Microsoft.Office.Tools.CustomTaskPane controlTaskPane;
-        public Layout layout = Globals.ThisAddIn.layout;
+        public enum Pane
+        {
+            Name,
+            Query,
+            PowerQuery
+        }
+
         public string appPath = AppDomain.CurrentDomain.BaseDirectory;
         public UserControl control;
+        public CustomTaskPane controlTaskPane;
         public string htmlPath;
         public Task initTask;
-        public Task paneTask;
+        public Layout layout = Globals.ThisAddIn.layout;
         public Pane pane;
+        public Task paneTask;
+
         public WebView(Pane pane)
         {
+            layout.webView = this;
             control = new UserControl();
+            // ReSharper disable once VirtualMemberCallInConstructor
             Dock = DockStyle.Fill;
             controlTaskPane = layout.addIn.CustomTaskPanes.Add(control, "Excel Toolkit");
             control.Controls.Add(this);
-            controlTaskPane.Width = 1200;
-            layout.webView = this;
+            SetSize(1200);
             initTask = InitWebView(pane);
-          
+            controlTaskPane.Visible = false;
         }
-        public enum Pane
+
+        public new bool Visible
         {
-            name,
-            query
+            get => controlTaskPane.Visible;
+            set => controlTaskPane.Visible = value;
         }
-        async Task InitWebView(Pane pane)
+
+        private async Task InitWebView(Pane pane)
         {
             this.pane = pane;
             var env = await CoreWebView2Environment.CreateAsync(null, @"C:\temp\MyWebView2");
             await EnsureCoreWebView2Async(env);
-            CoreWebView2.AddHostObjectToScript("Layout", layout);
-            this.paneTask = LoadHTML(pane);
+            paneTask = LoadHtml(pane);
         }
 
-        public Task LoadHTML(Pane pane)
+        public Task LoadHtml(Pane pane)
         {
+            CoreWebView2.AddHostObjectToScript("Layout", layout);
             this.pane = pane;
-            htmlPath = Path.Combine(appPath, "HTML", pane.ToString() + ".html");
-            string html = File.ReadAllText(htmlPath);
+            htmlPath = Path.Combine(appPath, "HTML", pane + ".html");
+            var html = File.ReadAllText(htmlPath);
             NavigateToString(html);
             return Task.CompletedTask;
         }
-        public async void RunJS(string jsCode)
+
+        public async Task RunJavaScript(string jsCode)
         {
             await initTask;
             await paneTask;
             await CoreWebView2.ExecuteScriptAsync($"layout.{jsCode}");
         }
-        public void ShowControl()
-        {
-            controlTaskPane.Visible = !controlTaskPane.Visible;
-        }
+
         public void SetSize(int width)
         {
             controlTaskPane.Width = width;

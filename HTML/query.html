@@ -2,9 +2,9 @@
 <html lang="zh-CN">
 
 <head>
-	<meta charset="UTF-8" />
-	<link rel="icon" href="data:," />
-	<style>
+    <meta charset="UTF-8"/>
+    <link rel="icon" href="data:,"/>
+    <style>
 		* {
 			margin: 0;
 			padding: 0;
@@ -235,7 +235,7 @@
 			}
 		}
 	</style>
-	<script>
+    <script>
 		class Ele {
 			constructor() {
 				window.addEventListener("DOMContentLoaded", () => {
@@ -310,21 +310,21 @@
 		}
 		new Layout()
 	</script>
-	<title>Excel Toolkit</title>
+    <title>Excel Toolkit</title>
 </head>
 
 <body>
-	<div class="go">
-		<div class="search">
-			<input id="searchInput" placeholder="输入要搜索的内容" onkeydown="if(event.key === 'Enter') layout.Search()" />
-			<button id="searchButton" onclick="layout.Search()">搜索</button>
-		</div>
-		<div class="group" id="group">
-			<div class="level2_list" id="level2_list">
-			</div>
-		</div>
-	</div>
-	<div class="content" id="content">
-	</div>
+<div class="go">
+    <div class="search">
+        <input id="searchInput" placeholder="输入要搜索的内容" onkeydown="if(event.key === 'Enter') layout.Search()"/>
+        <button id="searchButton" onclick="layout.Search()">搜索</button>
+    </div>
+    <div class="group" id="group">
+        <div class="level2_list" id="level2_list">
+        </div>
+    </div>
+</div>
+<div class="content" id="content">
+</div>
 </body>
 </html>

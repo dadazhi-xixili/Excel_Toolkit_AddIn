@@ -2,15 +2,14 @@
 <html lang="zh-CN">
 
 <head>
-	<meta charset="UTF-8">
-	<link rel="icon" href="data:," />
-	<style>
+    <meta charset="UTF-8">
+    <link rel="icon" href="data:,"/>
+    <style>
 		* {
 			margin: 0;
 			padding: 0;
 		}
 
-		/* 表格基础样式 */
 		table {
 			/* 盒模型设置 */
 			box-sizing: border-box;
@@ -19,10 +18,7 @@
 			/* 边框分离模式 */
 			border-spacing: 0;
 			/* 单元格间距为0 */
-			margin: 1px;
-			/* 外边距5像素 */
-			width: 99%;
-			/* 宽度100%填充容器 */
+			width: 100%;
 			min-width: 500px;
 			font-family: "Segoe UI", "微软雅黑", sans-serif;
 			/* 字体设置 */
@@ -37,40 +33,32 @@
 				/* 圆角大小变量 */
 				--hover: #4caf500d;
 				/* 悬停颜色变量(带透明度) */
-
-				/* 第一行表头 */
 				tr {
-
 					&:first-child {
 						th {
 
-							/* 左上角圆角 */
 							&:first-child {
 								border-top-left-radius: var(--radiusPx);
 							}
 
-							/* 右上角圆角 */
 							&:last-child {
 								border-top-right-radius: var(--radiusPx);
 							}
 						}
 					}
-					&:nth-child(2){
+
+					&:nth-child(2) {
 						font-size: 12px;
-						border-bottom-width: 1px;
-						border-color: #E0E0E0;
-						border-style: solid;
 					}
 				}
 			}
 
 			/* 表格主体样式 */
-			tbody {
+			tbody,
+			tfoot {
 
 				tr {
 					height: 36px;
-
-					vertical-align: middle;
 
 					/* 表格单元格垂直居中 */
 					/* 单元格通用样式 */
@@ -88,7 +76,8 @@
 							text-align: center;
 							vertical-align: middle;
 							/* 内容居中 */
-							width: 45px;
+							width: 40px;
+							min-width: 35px;
 							/* 固定宽度50px */
 
 							/* 复选框自定义样式 */
@@ -144,12 +133,16 @@
 							}
 						}
 
-
 						/* 第4列(名称列) */
 						&:nth-child(4) {
 							width: 20%;
 							/* 宽度占20% */
-							max-width: 20%;
+							max-width: 300px;
+						}
+
+						&:nth-child(5) {
+							max-width: 70%;
+							max-width: 900px;
 						}
 
 						&[contenteditable="true"] {
@@ -175,7 +168,6 @@
 					&:last-child {
 
 						td {
-							
 
 							/* 左下角圆角 */
 							&:first-child {
@@ -191,56 +183,210 @@
 
 				}
 			}
+
+			.table-action-cell {
+				.table-action-btn {
+					border: none;
+					background: none;
+					cursor: pointer;
+					padding: 0px;
+					margin: 0 4px;
+					border-radius: 50%;
+					transition: transform 0.2s ease;
+
+					&:hover {
+						transform: scale(1.1);
+					}
+
+					&:active {
+						transform: scale(0.95);
+					}
+
+					svg {
+						display: block;
+
+						circle:first-child {
+							fill: white;
+							stroke-width: 1.5;
+						}
+
+						path {
+							stroke-width: 2.2;
+							stroke-linecap: round;
+						}
+
+						.hover-layer {
+							fill: transparent;
+							transition: fill 0.3s ease;
+						}
+					}
+				}
+
+				#addrow {
+					svg {
+						circle:first-child {
+							stroke: #3a8c55;
+						}
+
+						path {
+							stroke: #3a8c55;
+						}
+
+						.hover-layer:hover {
+							fill: rgba(58, 140, 85, 0.1);
+						}
+					}
+				}
+
+				#delrow {
+					svg {
+						circle:first-child {
+							stroke: #c45c40;
+						}
+
+						path {
+							stroke: #c45c40;
+						}
+
+						.hover-layer:hover {
+							fill: rgba(196, 92, 64, 0.1);
+						}
+					}
+				}
+			}
 		}
 	</style>
-	<title>Excel Toolkit</title>
+    <script>
+		class Ele {
+			constructor() {
+				this.table = document.getElementsByTagName("table")[0];
+				this.tbody = this.table.tBodies[0];
+			}
+			get rows() {
+				return this.table.rows;
+			}
+			get rowLast() {
+				return this.rows[this.rows.length - 1];
+			}
+		}
+		class Api {
+			constructor() {
+				let layout = chrome.webview.hostObjects.Layout;
+				this.GetAll = layout.GetNameTable;
+			}
+
+		}
+		class Layout {
+			constructor() {
+				window.addEventListener("DOMContentLoaded", () => {
+					window.layout = this;
+					this.api = new Api();
+					this.ele = new Ele();
+					this.Init();
+				})
+			}
+			async Init() {
+				let data = await this.api.GetAll();
+				this.data = await JSON.parse(data);
+				this.LoadTable();
+			}
+			LoadTable() {
+				let html = '';
+				this.data.forEach((x, i) => {
+					html +=
+						`<tr id="row${i}" class="row">
+						<td><input type="checkbox" ${x.isInApp ? "checked" : ""}></td>
+						<td><input type="checkbox" ${x.isInBook ? "checked" : ""}></td>
+						<td><input type="checkbox" ${x.isInSheet ? "checked" : ""}></td>
+						<td contenteditable="true">${x.name}</td>
+						<td contenteditable="true">${x.fun}</td>
+					</tr>`
+				})
+				this.ele.tbody.innerHTML = html;
+			}
+
+		}
+		new Layout();
+	</script>
+    <title>Excel Toolkit</title>
 </head>
 
 <body>
-	<table class="controlPane">
-		<thead>
-			<tr>
-				<th colspan="3" class="isIn">激活范围</th>
-				<th rowspan="2" class="name">名称</th>
-				<th rowspan="2" class="func">表达式</th>
-			</tr>
-			<tr>
-				<th class="app">全局</th>
-				<th class="book">工作簿</th>
-				<th class="sheet">工作表</th>
-			</tr>
-		</thead>
-		<tbody class="data">
-			<tr id="row1" class="row">
-				<td><input type="checkbox" checked></td>
-				<td><input type="checkbox"></td>
-				<td><input type="checkbox"></td>
-				<td contenteditable="true"></td>
-				<td contenteditable="true"></td>
-			</tr>
-			<tr id="row2" class="row">
-				<td><input type="checkbox"></td>
-				<td><input type="checkbox"></td>
-				<td><input type="checkbox"></td>
-				<td contenteditable="true">测试名称1</td>
-				<td contenteditable="true">=A1+B1</td>
-			</tr>
-			<tr id="row3" class="row">
-				<td><input type="checkbox"></td>
-				<td><input type="checkbox"></td>
-				<td><input type="checkbox"></td>
-				<td contenteditable="true">测试名称2</td>
-				<td contenteditable="true">=SUM(C1:C10)</td>
-			</tr>
-			<tr id="rowLast" class="row">
-				<td colspan="5" class="add-row-cell">
-					<button class="add-row-button">
-						<span class="plus-icon">+</span>
-					</button>
-				</td>
-			</tr>
-		</tbody>
-	</table>
+<table class="controlPane">
+    <thead>
+    <tr>
+        <th colspan="3" class="isIn">激活范围</th>
+        <th rowspan="2" class="name">名称</th>
+        <th rowspan="2" class="func">表达式</th>
+    </tr>
+    <tr>
+        <th class="app">全局</th>
+        <th class="book">工作簿</th>
+        <th class="sheet">工作表</th>
+    </tr>
+    </thead>
+    <tbody class="data">
+    <tr id="row1" class="row">
+        <td>
+            <input type="checkbox" checked>
+        </td>
+        <td>
+            <input type="checkbox">
+        </td>
+        <td>
+            <input type="checkbox">
+        </td>
+        <td contenteditable="true"></td>
+        <td contenteditable="true"></td>
+    </tr>
+    <tr id="row2" class="row">
+        <td>
+            <input type="checkbox">
+        </td>
+        <td>
+            <input type="checkbox">
+        </td>
+        <td>
+            <input type="checkbox">
+        </td>
+        <td contenteditable="true">测试名称1</td>
+        <td contenteditable="true">=A1+B1</td>
+    </tr>
+    <tr id="row3" class="row">
+        <td>
+            <input type="checkbox">
+        </td>
+        <td>
+            <input type="checkbox">
+        </td>
+        <td>
+            <input type="checkbox">
+        </td>
+        <td contenteditable="true">测试名称2</td>
+        <td contenteditable="true">=SUM(C1:C10)</td>
+    </tr>
+    <tfoot>
+    <tr id="rowLast" class="row">
+        <td colspan="5" class="table-action-cell">
+            <button id="addrow" class="table-action-btn">
+                <svg width="28" height="28" viewBox="0 0 32 32">
+                    <circle cx="16" cy="16" r="14"/>
+                    <path d="M16 10V22M10 16H22"/>
+                    <circle cx="16" cy="16" r="15" class="hover-layer"/>
+                </svg>
+            </button>
+            <button id="delrow" class="table-action-btn">
+                <svg width="28" height="28" viewBox="0 0 32 32">
+                    <circle cx="16" cy="16" r="14"/>
+                    <path d="M10 16H22"/>
+                    <circle cx="16" cy="16" r="15" class="hover-layer"/>
+                </svg>
+            </button>
+        </td>
+    </tr>
+    </tfoot>
+    </tbody>
+</table>
 </body>
 
 </html>
